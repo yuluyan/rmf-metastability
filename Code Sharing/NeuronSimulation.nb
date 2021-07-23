@@ -1,0 +1,2124 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 12.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     89574,       2116]
+NotebookOptionsPosition[     89004,       2097]
+NotebookOutlinePosition[     89617,       2118]
+CellTagsIndexPosition[     89574,       2115]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{"<<", "UtilityManager`"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"ParallelEvaluate", "[", 
+    RowBox[{"<<", "UtilityManager`"}], "]"}], ";"}], 
+  "\n"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"sampleExponential", "=", 
+   RowBox[{"Compile", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"lambda", ",", "_Real"}], "}"}], "}"}], ",", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"-", 
+        RowBox[{"Log", "[", 
+         RowBox[{"1", "-", 
+          RowBox[{"RandomReal", "[", "]"}]}], "]"}]}], "/", "lambda"}], 
+      ")"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"sampleExponentialList", "=", 
+    RowBox[{"Compile", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"{", 
+        RowBox[{"lambdas", ",", "_Real", ",", "1"}], "}"}], "}"}], ",", 
+      RowBox[{
+       RowBox[{"-", 
+        RowBox[{"Log", "[", 
+         RowBox[{"1", "-", 
+          RowBox[{"RandomReal", "[", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"0", ",", "1"}], "}"}], ",", 
+            RowBox[{"Length", "[", "lambdas", "]"}]}], "]"}]}], "]"}]}], "/", 
+       "lambdas"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"PoissonSamplerFindRoot", "[", 
+      RowBox[{"\[Tau]_", ",", "h_", ",", "a_", ",", 
+       RowBox[{"0.", "|", "0"}]}], "]"}], ":=", 
+     RowBox[{"sampleExponential", "[", "h", "]"}]}], ";", 
+    "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"PoissonSamplerFindRoot", "[", 
+      RowBox[{"\[Tau]_", ",", "h_", ",", "a_", ",", "x0_"}], "]"}], ":=", 
+     RowBox[{"Module", "[", 
+      RowBox[{
+       RowBox[{"{", "u", "}"}], ",", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"u", "=", 
+         RowBox[{"RandomReal", "[", "]"}]}], ";", "\[IndentingNewLine]", 
+        RowBox[{"t", "/.", 
+         RowBox[{"FindRoot", "[", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"h", " ", "\[Tau]", " ", 
+             RowBox[{"(", 
+              RowBox[{
+               RowBox[{"ExpIntegralEi", "[", 
+                RowBox[{"a", " ", "x0", " ", 
+                 RowBox[{"Exp", "[", 
+                  RowBox[{
+                   RowBox[{"-", "t"}], "/", "\[Tau]"}], "]"}]}], "]"}], "-", 
+               RowBox[{"ExpIntegralEi", "[", 
+                RowBox[{"a", " ", "x0"}], "]"}]}], ")"}]}], "\[Equal]", 
+            RowBox[{"Log", "[", "u", "]"}]}], ",", 
+           RowBox[{"{", 
+            RowBox[{"t", ",", "5."}], "}"}]}], "]"}]}]}]}], 
+      "\[IndentingNewLine]", "]"}]}], ";"}], "\[IndentingNewLine]", "*)"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"inverseLogIntegral", "=", "\[IndentingNewLine]", 
+    RowBox[{"Compile", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"xx", ",", "_Real"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"leftBranch", ",", 
+          RowBox[{"True", "|", "False"}]}], "}"}]}], "}"}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{"Module", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"z0", ",", 
+          RowBox[{"z1", "=", "1."}], ",", 
+          RowBox[{"delta", "=", "0."}], ",", 
+          RowBox[{"maxIter", "=", "10"}], ",", 
+          RowBox[{"x", "=", 
+           RowBox[{"N", "@", "xx"}]}]}], "}"}], ",", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{"leftBranch", "&&", 
+            RowBox[{"x", "\[LessEqual]", "0"}]}], ",", "\[IndentingNewLine]", 
+           
+           RowBox[{
+            RowBox[{"z0", "=", 
+             RowBox[{"1", "-", 
+              RowBox[{"Exp", "[", 
+               RowBox[{"x", "-", "EulerGamma"}], "]"}]}]}], ";"}], 
+           "\[IndentingNewLine]", ",", "\[IndentingNewLine]", 
+           RowBox[{
+            RowBox[{"z0", "=", 
+             RowBox[{"If", "[", 
+              RowBox[{
+               RowBox[{"x", ">", "3.5"}], ",", 
+               RowBox[{"x", " ", 
+                RowBox[{"Log", "[", "x", "]"}]}], ",", "\[IndentingNewLine]", 
+               
+               RowBox[{"If", "[", 
+                RowBox[{
+                 RowBox[{"x", ">", "0.75"}], ",", 
+                 RowBox[{"1", "+", "x"}], ",", "\[IndentingNewLine]", 
+                 RowBox[{"If", "[", 
+                  RowBox[{
+                   RowBox[{"x", ">", 
+                    RowBox[{"-", "0.5"}]}], ",", 
+                   RowBox[{"1.45137", "+", 
+                    RowBox[{"0.37251", " ", "x"}]}], ",", 
+                   "\[IndentingNewLine]", 
+                   RowBox[{"If", "[", 
+                    RowBox[{
+                    RowBox[{"x", ">", 
+                    RowBox[{"-", "35"}]}], ",", 
+                    RowBox[{"1", "+", 
+                    RowBox[{"Exp", "[", 
+                    RowBox[{"x", "-", "EulerGamma"}], "]"}]}], ",", 
+                    "\[IndentingNewLine]", "1."}], "\[IndentingNewLine]", 
+                    "]"}]}], "]"}]}], "]"}]}], "]"}]}], ";"}]}], 
+          "\[IndentingNewLine]", "]"}], ";", "\[IndentingNewLine]", 
+         RowBox[{"Do", "[", "\[IndentingNewLine]", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"delta", "=", 
+             RowBox[{
+              RowBox[{"LogIntegral", "[", "z0", "]"}], "-", "x"}]}], ";", 
+            "\[IndentingNewLine]", 
+            RowBox[{"z1", "=", 
+             RowBox[{"z0", "-", 
+              RowBox[{"delta", " ", 
+               RowBox[{
+                RowBox[{"Log", "[", "z0", "]"}], "/", 
+                RowBox[{"(", 
+                 RowBox[{"1", "+", 
+                  RowBox[{"delta", "/", 
+                   RowBox[{"(", 
+                    RowBox[{"2", "z0"}], ")"}]}]}], ")"}]}]}]}]}], ";", 
+            "\[IndentingNewLine]", 
+            RowBox[{"If", "[", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"Abs", "[", 
+                RowBox[{"z1", "-", "z0"}], "]"}], "<", 
+               RowBox[{"10", "^", 
+                RowBox[{"-", "9"}]}]}], ",", 
+              RowBox[{"Break", "[", "]"}]}], "]"}], ";", 
+            "\[IndentingNewLine]", 
+            RowBox[{"z0", "=", "z1"}], ";"}], "\[IndentingNewLine]", ",", 
+           RowBox[{"{", 
+            RowBox[{"ii", ",", "maxIter"}], "}"}]}], "]"}], ";", 
+         "\[IndentingNewLine]", "z1"}]}], "\[IndentingNewLine]", "]"}]}], 
+     "\[IndentingNewLine]", "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"asymptoticExpIntegralEi", "=", 
+    RowBox[{"Compile", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"\[Tau]", ",", "_Real"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"ax0", ",", "_Real"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"c", ",", "_Real"}], "}"}]}], "}"}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{"Module", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"t0", ",", "delta", ",", "scale"}], "}"}], ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"t0", "=", 
+          RowBox[{"\[Tau]", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"-", "c"}], "+", "EulerGamma", "+", 
+             RowBox[{"Log", "[", 
+              RowBox[{"Abs", "@", "ax0"}], "]"}]}], ")"}]}]}], ";", 
+         "\[IndentingNewLine]", 
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{
+            RowBox[{
+             RowBox[{"t0", "/", "\[Tau]"}], "<", "100"}], "&&", 
+            RowBox[{
+             RowBox[{"ax0", " ", 
+              RowBox[{"Exp", "[", 
+               RowBox[{
+                RowBox[{"-", "t0"}], "/", "\[Tau]"}], "]"}]}], ">", 
+             "1.*^-37"}]}], ",", "\[IndentingNewLine]", 
+           RowBox[{
+            RowBox[{"delta", "=", 
+             RowBox[{"c", "-", 
+              RowBox[{"ExpIntegralEi", "[", 
+               RowBox[{"ax0", " ", 
+                RowBox[{"Exp", "[", 
+                 RowBox[{
+                  RowBox[{"-", "t0"}], "/", "\[Tau]"}], "]"}]}], "]"}]}]}], 
+            ";", "\[IndentingNewLine]", 
+            RowBox[{"While", "[", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"Abs", "[", 
+                RowBox[{"delta", "/", "c"}], "]"}], ">", "0.00001"}], ",", 
+              "\[IndentingNewLine]", 
+              RowBox[{"If", "[", 
+               RowBox[{
+                RowBox[{"delta", ">", "0"}], ",", "\[IndentingNewLine]", 
+                RowBox[{"t0", "*=", "0.99"}], ",", "\[IndentingNewLine]", 
+                RowBox[{"t0", "*=", "1.01"}]}], "\[IndentingNewLine]", 
+               "]"}]}], "\[IndentingNewLine]", "]"}], ";"}]}], 
+          "\[IndentingNewLine]", "]"}], ";", "\[IndentingNewLine]", "t0"}]}], 
+       "\[IndentingNewLine]", "]"}]}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"SetAttributes", "[", 
+   RowBox[{"PoissonSampler", ",", "Listable"}], "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"PoissonSampler", "[", 
+    RowBox[{"\[Tau]_", ",", "h_", ",", "a_", ",", 
+     RowBox[{"0.", "|", "0"}]}], "]"}], ":=", 
+   RowBox[{"sampleExponential", "[", "h", "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PoissonSamplerCompile", "=", 
+   RowBox[{"Compile", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"\[Tau]", ",", "_Real"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"h", ",", "_Real"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"a", ",", "_Real"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"x0", ",", "_Real"}], "}"}]}], "}"}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"Module", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"u", "=", 
+          RowBox[{"RandomReal", "[", "]"}]}], ",", "c", ",", "f", ",", 
+         RowBox[{"ax0", "=", 
+          RowBox[{"a", " ", "x0"}]}]}], "}"}], ",", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"c", "=", 
+         RowBox[{
+          RowBox[{"ExpIntegralEi", "[", "ax0", "]"}], "+", 
+          RowBox[{
+           RowBox[{"Log", "[", "u", "]"}], "/", 
+           RowBox[{"(", 
+            RowBox[{"h", " ", "\[Tau]"}], ")"}]}]}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"If", "[", 
+         RowBox[{
+          RowBox[{"c", "<", 
+           RowBox[{"-", "35"}]}], ",", "\[IndentingNewLine]", 
+          RowBox[{"asymptoticExpIntegralEi", "[", 
+           RowBox[{"\[Tau]", ",", "ax0", ",", "c"}], "]"}], ",", 
+          "\[IndentingNewLine]", 
+          RowBox[{
+           RowBox[{"f", "=", 
+            RowBox[{"inverseLogIntegral", "[", 
+             RowBox[{"c", ",", 
+              RowBox[{"x0", "<", "0"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+           RowBox[{
+            RowBox[{"-", "\[Tau]"}], " ", 
+            RowBox[{"Log", "[", 
+             RowBox[{
+              RowBox[{"(", 
+               RowBox[{"Log", "[", "f", "]"}], ")"}], "/", 
+              RowBox[{"(", "ax0", ")"}]}], "]"}]}]}]}], "\[IndentingNewLine]",
+          "]"}]}]}], "\[IndentingNewLine]", "]"}], ",", " ", 
+     RowBox[{"RuntimeAttributes", "\[Rule]", "Listable"}], ",", 
+     RowBox[{"Parallelization", "\[Rule]", "True"}], ",", 
+     RowBox[{"RuntimeOptions", "\[Rule]", "\"\<Speed\>\""}]}], 
+    "\[IndentingNewLine]", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"PoissonSampler", "[", 
+     RowBox[{"\[Tau]_", ",", "h_", ",", "a_", ",", "x0_"}], "]"}], ":=", 
+    RowBox[{"PoissonSamplerCompile", "[", 
+     RowBox[{"\[Tau]", ",", "h", ",", "a", ",", "x0"}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"zeroDiagonal", "[", "mat_", "]"}], ":=", 
+    RowBox[{
+     RowBox[{"UpperTriangularize", "[", 
+      RowBox[{"mat", ",", "1"}], "]"}], "+", 
+     RowBox[{"LowerTriangularize", "[", 
+      RowBox[{"mat", ",", 
+       RowBox[{"-", "1"}]}], "]"}]}]}], ";"}], "\[IndentingNewLine]"}], "\n", 
+
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"SingleNeuronSimulation", "[", 
+     RowBox[{
+     "\[Tau]_", ",", "h_", ",", "a_", ",", "inputRates_", ",", 
+      "inputWeights_", ",", "hasReset_", ",", "eventCount_", ",", 
+      RowBox[{"xx0_", ":", "0."}]}], "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"eventRecords", "=", 
+         RowBox[{"{", "}"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"eventIdRecords", "=", 
+         RowBox[{"{", "}"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"eventTimeRecords", "=", 
+         RowBox[{"{", "}"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"xRecords", "=", 
+         RowBox[{"{", "}"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"x0", "=", 
+         RowBox[{"N", "@", "xx0"}]}], ",", "\[IndentingNewLine]", 
+        "inputTimeList", ",", "spikeTime", ",", "minInputId", ",", 
+        "minInputTime"}], "\[IndentingNewLine]", "}"}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"Do", "[", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"inputTimeList", "=", 
+           RowBox[{"sampleExponentialList", "[", "inputRates", "]"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"spikeTime", "=", 
+           RowBox[{"PoissonSampler", "[", 
+            RowBox[{"\[Tau]", ",", "h", ",", "a", ",", "x0"}], "]"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"minInputId", ",", "minInputTime"}], "}"}], "=", 
+           RowBox[{"MinAndPosition", "[", "inputTimeList", "]"}]}], ";", 
+          "\[IndentingNewLine]", "\[IndentingNewLine]", 
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{"spikeTime", "<", "minInputTime"}], ",", 
+            "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{"If", "[", 
+              RowBox[{"hasReset", ",", "\[IndentingNewLine]", 
+               RowBox[{"x0", "=", "0."}], ",", "\[IndentingNewLine]", 
+               RowBox[{"Quiet", "[", 
+                RowBox[{
+                 RowBox[{"x0", "=", 
+                  RowBox[{"x0", " ", 
+                   RowBox[{"Exp", "[", 
+                    RowBox[{
+                    RowBox[{"-", "spikeTime"}], "/", "\[Tau]"}], "]"}]}]}], 
+                 ",", 
+                 RowBox[{"General", "::", "munfl"}]}], "]"}]}], 
+              "\[IndentingNewLine]", "]"}], ";", "\[IndentingNewLine]", 
+             RowBox[{"eventIdRecords", "=", 
+              RowBox[{"{", 
+               RowBox[{"eventIdRecords", ",", "0"}], "}"}]}], ";", 
+             "\[IndentingNewLine]", 
+             RowBox[{"eventTimeRecords", "=", 
+              RowBox[{"{", 
+               RowBox[{"eventTimeRecords", ",", "spikeTime"}], "}"}]}], ";"}],
+             "\[IndentingNewLine]", ",", "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{"Quiet", "[", 
+              RowBox[{
+               RowBox[{"x0", "=", 
+                RowBox[{
+                 RowBox[{"x0", " ", 
+                  RowBox[{"Exp", "[", 
+                   RowBox[{
+                    RowBox[{"-", "minInputTime"}], "/", "\[Tau]"}], "]"}]}], 
+                 "+", 
+                 RowBox[{"inputWeights", "[", 
+                  RowBox[{"[", "minInputId", "]"}], "]"}]}]}], ",", 
+               RowBox[{"General", "::", "munfl"}]}], "]"}], ";", 
+             "\[IndentingNewLine]", 
+             RowBox[{"eventIdRecords", "=", 
+              RowBox[{"{", 
+               RowBox[{"eventIdRecords", ",", "minInputId"}], "}"}]}], ";", 
+             "\[IndentingNewLine]", 
+             RowBox[{"eventTimeRecords", "=", 
+              RowBox[{"{", 
+               RowBox[{"eventTimeRecords", ",", "minInputTime"}], "}"}]}], 
+             ";"}]}], "\[IndentingNewLine]", "]"}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"xRecords", "=", 
+           RowBox[{"{", 
+            RowBox[{"xRecords", ",", "x0"}], "}"}]}], ";"}], 
+         "\[IndentingNewLine]", ",", 
+         RowBox[{"{", "eventCount", "}"}]}], "]"}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"eventTimeRecords", "=", 
+        RowBox[{"Accumulate", "@", 
+         RowBox[{"Flatten", "[", "eventTimeRecords", "]"}]}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"eventRecords", "=", 
+        RowBox[{"Thread", "[", 
+         RowBox[{"Flatten", "/@", 
+          RowBox[{"{", 
+           RowBox[{
+           "eventTimeRecords", ",", "eventIdRecords", ",", "xRecords"}], 
+           "}"}]}], "]"}]}]}]}], "\[IndentingNewLine]", "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"SingleNeuronSimulationUntilSpikeCount", "[", 
+     RowBox[{
+     "\[Tau]_", ",", "h_", ",", "a_", ",", "inputRates_", ",", 
+      "inputWeights_", ",", "hasReset_", ",", "spikeCount_", ",", 
+      RowBox[{"xx0_", ":", "0."}], ",", 
+      RowBox[{"keepAllInfo_", ":", "True"}]}], "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"eventRecords", "=", 
+         RowBox[{"{", "}"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"eventIdRecords", "=", 
+         RowBox[{"{", "}"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"eventTimeRecords", "=", 
+         RowBox[{"{", "}"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"xRecords", "=", 
+         RowBox[{"{", "}"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"x0", "=", 
+         RowBox[{"N", "@", "xx0"}]}], ",", "\[IndentingNewLine]", 
+        "inputTimeList", ",", "spikeTime", ",", "minInputId", ",", 
+        "minInputTime", ",", "\[IndentingNewLine]", 
+        RowBox[{"eventTime", "=", "0."}], ",", "\[IndentingNewLine]", 
+        RowBox[{"currentSpikeCount", "=", "0"}]}], "\[IndentingNewLine]", 
+       "}"}], ",", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"Do", "[", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"inputTimeList", "=", 
+           RowBox[{"sampleExponentialList", "[", "inputRates", "]"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"spikeTime", "=", 
+           RowBox[{"PoissonSampler", "[", 
+            RowBox[{"\[Tau]", ",", "h", ",", "a", ",", "x0"}], "]"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"minInputId", ",", "minInputTime"}], "}"}], "=", 
+           RowBox[{"MinAndPosition", "[", "inputTimeList", "]"}]}], ";", 
+          "\[IndentingNewLine]", "\[IndentingNewLine]", 
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{"spikeTime", "<", "minInputTime"}], ",", 
+            "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{"If", "[", 
+              RowBox[{"hasReset", ",", "\[IndentingNewLine]", 
+               RowBox[{"x0", "=", "0."}], ",", "\[IndentingNewLine]", 
+               RowBox[{"Quiet", "[", 
+                RowBox[{
+                 RowBox[{"x0", "=", 
+                  RowBox[{"x0", " ", 
+                   RowBox[{"Exp", "[", 
+                    RowBox[{
+                    RowBox[{"-", "spikeTime"}], "/", "\[Tau]"}], "]"}]}]}], 
+                 ",", 
+                 RowBox[{"General", "::", "munfl"}]}], "]"}]}], 
+              "\[IndentingNewLine]", "]"}], ";", "\[IndentingNewLine]", 
+             RowBox[{"currentSpikeCount", "=", 
+              RowBox[{"currentSpikeCount", "+", "1"}]}], ";", 
+             "\[IndentingNewLine]", 
+             RowBox[{"If", "[", 
+              RowBox[{"keepAllInfo", ",", "\[IndentingNewLine]", 
+               RowBox[{
+                RowBox[{"eventIdRecords", "=", 
+                 RowBox[{"{", 
+                  RowBox[{"eventIdRecords", ",", "0"}], "}"}]}], ";", 
+                "\[IndentingNewLine]", 
+                RowBox[{"eventTimeRecords", "=", 
+                 RowBox[{"{", 
+                  RowBox[{"eventTimeRecords", ",", "spikeTime"}], "}"}]}], 
+                ";"}], "\[IndentingNewLine]", ",", "\[IndentingNewLine]", 
+               RowBox[{
+                RowBox[{"eventTime", "=", 
+                 RowBox[{"eventTime", "+", "spikeTime"}]}], ";", 
+                "\[IndentingNewLine]", 
+                RowBox[{"eventTimeRecords", "=", 
+                 RowBox[{"{", 
+                  RowBox[{"eventTimeRecords", ",", "eventTime"}], "}"}]}], 
+                ";"}]}], "\[IndentingNewLine]", "]"}], ";"}], 
+            "\[IndentingNewLine]", 
+            RowBox[{"(*", "\[IndentingNewLine]", 
+             RowBox[{
+              RowBox[{"If", "[", 
+               RowBox[{
+                RowBox[{"currentSpikeCount", "===", 
+                 RowBox[{"Floor", "[", 
+                  RowBox[{"0.25", "spikeCount"}], "]"}]}], ",", 
+                "\[IndentingNewLine]", 
+                RowBox[{"PrintTemporary", "[", 
+                 RowBox[{"\"\<Total Spike: \>\"", "<>", 
+                  RowBox[{"ToString", "[", "step", "]"}], "<>", 
+                  "\"\< Spike count: \>\"", "<>", 
+                  RowBox[{"ToString", "[", "currentSpikeCount", "]"}], "<>", 
+                  "\"\<  --  25%...\>\""}], "]"}]}], "\[IndentingNewLine]", 
+               "]"}], ";", "\[IndentingNewLine]", 
+              RowBox[{"If", "[", 
+               RowBox[{
+                RowBox[{"currentSpikeCount", "===", 
+                 RowBox[{"Floor", "[", 
+                  RowBox[{"0.50", "spikeCount"}], "]"}]}], ",", 
+                "\[IndentingNewLine]", 
+                RowBox[{"PrintTemporary", "[", 
+                 RowBox[{"\"\<Total Spike: \>\"", "<>", 
+                  RowBox[{"ToString", "[", "step", "]"}], "<>", 
+                  "\"\< Spike count: \>\"", "<>", 
+                  RowBox[{"ToString", "[", "currentSpikeCount", "]"}], "<>", 
+                  "\"\<  --  50%...\>\""}], "]"}]}], "\[IndentingNewLine]", 
+               "]"}], ";", "\[IndentingNewLine]", 
+              RowBox[{"If", "[", 
+               RowBox[{
+                RowBox[{"currentSpikeCount", "===", 
+                 RowBox[{"Floor", "[", 
+                  RowBox[{"0.75", "spikeCount"}], "]"}]}], ",", 
+                "\[IndentingNewLine]", 
+                RowBox[{"PrintTemporary", "[", 
+                 RowBox[{"\"\<Total Spike: \>\"", "<>", 
+                  RowBox[{"ToString", "[", "step", "]"}], "<>", 
+                  "\"\< Spike count: \>\"", "<>", 
+                  RowBox[{"ToString", "[", "currentSpikeCount", "]"}], "<>", 
+                  "\"\<  --  75%...\>\""}], "]"}]}], "\[IndentingNewLine]", 
+               "]"}], ";", "\[IndentingNewLine]", 
+              RowBox[{"If", "[", 
+               RowBox[{
+                RowBox[{"currentSpikeCount", "===", 
+                 RowBox[{"Floor", "[", 
+                  RowBox[{"1.0", "spikeCount"}], "]"}]}], ",", 
+                "\[IndentingNewLine]", 
+                RowBox[{"PrintTemporary", "[", 
+                 RowBox[{"\"\<Total Spike: \>\"", "<>", 
+                  RowBox[{"ToString", "[", "step", "]"}], "<>", 
+                  "\"\< Spike count: \>\"", "<>", 
+                  RowBox[{"ToString", "[", "currentSpikeCount", "]"}], "<>", 
+                  "\"\<  -- 100%...\>\""}], "]"}]}], "\[IndentingNewLine]", 
+               "]"}], ";"}], "\[IndentingNewLine]", "*)"}], 
+            "\[IndentingNewLine]", ",", "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{"Quiet", "[", 
+              RowBox[{
+               RowBox[{"x0", "=", 
+                RowBox[{
+                 RowBox[{"x0", " ", 
+                  RowBox[{"Exp", "[", 
+                   RowBox[{
+                    RowBox[{"-", "minInputTime"}], "/", "\[Tau]"}], "]"}]}], 
+                 "+", 
+                 RowBox[{"inputWeights", "[", 
+                  RowBox[{"[", "minInputId", "]"}], "]"}]}]}], ",", 
+               RowBox[{"General", "::", "munfl"}]}], "]"}], ";", 
+             "\[IndentingNewLine]", 
+             RowBox[{"If", "[", 
+              RowBox[{"keepAllInfo", ",", "\[IndentingNewLine]", 
+               RowBox[{
+                RowBox[{"eventIdRecords", "=", 
+                 RowBox[{"{", 
+                  RowBox[{"eventIdRecords", ",", "minInputId"}], "}"}]}], ";",
+                 "\[IndentingNewLine]", 
+                RowBox[{"eventTimeRecords", "=", 
+                 RowBox[{"{", 
+                  RowBox[{"eventTimeRecords", ",", "minInputTime"}], "}"}]}], 
+                ";"}], "\[IndentingNewLine]", ",", "\[IndentingNewLine]", 
+               RowBox[{
+                RowBox[{"eventTime", "=", 
+                 RowBox[{"eventTime", "+", "minInputTime"}]}], ";"}]}], 
+              "\[IndentingNewLine]", "]"}], ";"}]}], "\[IndentingNewLine]", 
+           "]"}], ";", "\[IndentingNewLine]", 
+          RowBox[{"If", "[", 
+           RowBox[{"keepAllInfo", ",", "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{"xRecords", "=", 
+              RowBox[{"{", 
+               RowBox[{"xRecords", ",", "x0"}], "}"}]}], ";"}]}], 
+           "\[IndentingNewLine]", "]"}], ";", "\[IndentingNewLine]", 
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{"currentSpikeCount", "\[GreaterEqual]", "spikeCount"}], 
+            ",", "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{"Break", "[", "]"}], ";"}]}], "\[IndentingNewLine]", 
+           "]"}], ";"}], "\[IndentingNewLine]", ",", 
+         RowBox[{"{", 
+          RowBox[{"step", ",", "50000000"}], "}"}]}], "]"}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"If", "[", 
+        RowBox[{"keepAllInfo", ",", "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"eventTimeRecords", "=", 
+           RowBox[{"Accumulate", "@", 
+            RowBox[{"Flatten", "[", "eventTimeRecords", "]"}]}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"eventRecords", "=", 
+           RowBox[{"Thread", "[", 
+            RowBox[{"Flatten", "/@", 
+             RowBox[{"{", 
+              RowBox[{
+              "eventTimeRecords", ",", "eventIdRecords", ",", "xRecords"}], 
+              "}"}]}], "]"}]}]}], "\[IndentingNewLine]", ",", 
+         "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"Transpose", "[", 
+            RowBox[{"{", 
+             RowBox[{"#", ",", 
+              RowBox[{"ConstantArray", "[", 
+               RowBox[{"0", ",", 
+                RowBox[{"Length", "[", "#", "]"}]}], "]"}]}], "}"}], "]"}], 
+           "&"}], "[", 
+          RowBox[{"Flatten", "[", "eventTimeRecords", "]"}], "]"}]}], 
+        "\[IndentingNewLine]", "]"}]}]}], "\[IndentingNewLine]", "]"}]}], 
+   ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"SingleNeuronTrials", "[", 
+     RowBox[{
+     "\[Tau]_", ",", "h_", ",", "a_", ",", "inputRates_", ",", 
+      "inputWeights_", ",", "hasReset_", ",", "eventCount_", ",", "trials_", 
+      ",", 
+      RowBox[{"x0_", ":", "0"}]}], "]"}], ":=", "\[IndentingNewLine]", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", "rates", "}"}], ",", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"rates", "=", 
+        RowBox[{"ParallelTable", "[", 
+         RowBox[{
+          RowBox[{"NeuronMeanFiringRate", "[", 
+           RowBox[{
+            RowBox[{"SingleNeuronSimulation", "[", 
+             RowBox[{
+             "\[Tau]", ",", "h", ",", "a", ",", "inputRates", ",", 
+              "inputWeights", ",", "hasReset", ",", "eventCount", ",", "x0"}],
+              "]"}], ",", "0"}], "]"}], ",", 
+          RowBox[{"{", "trials", "}"}]}], "]"}]}], ";", "\[IndentingNewLine]",
+        "rates"}]}], "\[IndentingNewLine]", "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"SingleNeuronTrialsUntilSpikeCount", "[", 
+     RowBox[{
+     "\[Tau]_", ",", "h_", ",", "a_", ",", "inputRates_", ",", 
+      "inputWeights_", ",", "hasReset_", ",", "spikeCount_", ",", "trials_", 
+      ",", 
+      RowBox[{"x0_", ":", "0"}], ",", 
+      RowBox[{"keepAllInfo_", ":", "True"}]}], "]"}], ":=", 
+    "\[IndentingNewLine]", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", "rates", "}"}], ",", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"rates", "=", 
+        RowBox[{"ParallelTable", "[", 
+         RowBox[{
+          RowBox[{"NeuronMeanFiringRate", "[", 
+           RowBox[{
+            RowBox[{"SingleNeuronSimulationUntilSpikeCount", "[", 
+             RowBox[{
+             "\[Tau]", ",", "h", ",", "a", ",", "inputRates", ",", 
+              "inputWeights", ",", "hasReset", ",", "spikeCount", ",", "x0", 
+              ",", "keepAllInfo"}], "]"}], ",", "0"}], "]"}], ",", 
+          RowBox[{"{", "trials", "}"}]}], "]"}]}], ";", "\[IndentingNewLine]",
+        "rates"}]}], "\[IndentingNewLine]", "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"formatTimeFromSeconds", "[", "secs_", "]"}], ":=", 
+    RowBox[{"If", "[", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"secs", "<", "60"}], ",", 
+      RowBox[{"Quantity", "[", 
+       RowBox[{"secs", ",", "\"\<second\>\""}], "]"}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{"If", "[", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"secs", "<", "3600"}], ",", "\[IndentingNewLine]", 
+        RowBox[{"UnitConvert", "[", 
+         RowBox[{
+          RowBox[{"Quantity", "[", 
+           RowBox[{
+            RowBox[{"secs", "/", "60"}], ",", "\"\<minute\>\""}], "]"}], ",", 
+          
+          RowBox[{"MixedUnit", "[", 
+           RowBox[{"{", 
+            RowBox[{"\"\<Minutes\>\"", ",", "\"\<Seconds\>\""}], "}"}], 
+           "]"}]}], "]"}], ",", "\[IndentingNewLine]", 
+        RowBox[{"If", "[", "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"secs", "<", "86400"}], ",", "\[IndentingNewLine]", 
+          RowBox[{"UnitConvert", "[", 
+           RowBox[{
+            RowBox[{"Quantity", "[", 
+             RowBox[{
+              RowBox[{"secs", "/", "3600"}], ",", "\"\<hour\>\""}], "]"}], 
+            ",", 
+            RowBox[{"MixedUnit", "[", 
+             RowBox[{"{", 
+              RowBox[{
+              "\"\<Hours\>\"", ",", "\"\<Minutes\>\"", ",", 
+               "\"\<Seconds\>\""}], "}"}], "]"}]}], "]"}], ",", 
+          "\[IndentingNewLine]", 
+          RowBox[{"UnitConvert", "[", 
+           RowBox[{
+            RowBox[{"Quantity", "[", 
+             RowBox[{
+              RowBox[{"secs", "/", "86400"}], ",", "\"\<day\>\""}], "]"}], 
+            ",", 
+            RowBox[{"MixedUnit", "[", 
+             RowBox[{"{", 
+              RowBox[{"\"\<Days\>\"", ",", "\"\<Hours\>\""}], "}"}], "]"}]}], 
+           "]"}]}], "\[IndentingNewLine]", "]"}]}], "]"}]}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"showProgressBar", "[", 
+     RowBox[{
+      RowBox[{"dyn", ":", 
+       RowBox[{"Dynamic", "[", "var_", "]"}]}], ",", "total_", ",", 
+      "label_String"}], "]"}], ":=", 
+    RowBox[{"With", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"now", "=", 
+        RowBox[{"AbsoluteTime", "[", "]"}]}], "}"}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{"CellPrint", "[", 
+       RowBox[{"CellGroup", "[", 
+        RowBox[{"{", 
+         RowBox[{"Row", "[", 
+          RowBox[{"{", "\[IndentingNewLine]", 
+           RowBox[{
+            RowBox[{"TextCell", "[", 
+             RowBox[{"\"\<                   \>\"", ",", "\"\<Text\>\""}], 
+             "]"}], ",", "\[IndentingNewLine]", 
+            RowBox[{"TextCell", "[", 
+             RowBox[{
+              RowBox[{"label", "<>", "\"\<   \>\""}], ",", "\"\<Text\>\""}], 
+             "]"}], ",", 
+            RowBox[{"ExpressionCell", "[", 
+             RowBox[{"ProgressIndicator", "[", 
+              RowBox[{"dyn", ",", 
+               RowBox[{"{", 
+                RowBox[{"0", ",", "total"}], "}"}], ",", 
+               RowBox[{"ImageSize", "\[Rule]", "200"}]}], "]"}], "]"}], ",", 
+            "\[IndentingNewLine]", 
+            RowBox[{"TextCell", "[", 
+             RowBox[{"\"\< \>\"", ",", "\"\<Text\>\""}], "]"}], ",", 
+            "\[IndentingNewLine]", 
+            RowBox[{"TextCell", "[", 
+             RowBox[{
+              RowBox[{"Dynamic", "[", 
+               RowBox[{
+                RowBox[{"ToString", "[", 
+                 RowBox[{"NumberForm", "[", 
+                  RowBox[{
+                   RowBox[{"100.", "*", 
+                    RowBox[{"var", "/", "total"}]}], ",", 
+                   RowBox[{"{", 
+                    RowBox[{"4", ",", "2"}], "}"}], ",", 
+                   RowBox[{"NumberPadding", "\[Rule]", 
+                    RowBox[{"{", 
+                    RowBox[{"\"\< \>\"", ",", " ", "\"\<0\>\""}], "}"}]}]}], 
+                  "]"}], "]"}], ",", 
+                RowBox[{"TrackedSymbols", "\[RuleDelayed]", 
+                 RowBox[{"{", "var", "}"}]}]}], "]"}], ",", "\"\<Text\>\"", 
+              ",", 
+              RowBox[{"ShowStringCharacters", "\[Rule]", "False"}]}], "]"}], 
+            ",", "\[IndentingNewLine]", 
+            RowBox[{"TextCell", "[", 
+             RowBox[{"\"\<%\>\"", ",", "\"\<CodeText\>\""}], "]"}], ",", 
+            "\[IndentingNewLine]", 
+            RowBox[{"TextCell", "[", 
+             RowBox[{"\"\<    ETA:  \>\"", ",", "\"\<Text\>\""}], "]"}], ",", 
+            "\[IndentingNewLine]", 
+            RowBox[{"TextCell", "[", 
+             RowBox[{
+              RowBox[{"Dynamic", "[", 
+               RowBox[{
+                RowBox[{"NumberForm", "[", 
+                 RowBox[{
+                  RowBox[{"formatTimeFromSeconds", "[", 
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{"(", 
+                    RowBox[{
+                    RowBox[{"AbsoluteTime", "[", "]"}], "-", "now"}], ")"}], 
+                    "/", " ", 
+                    RowBox[{"Max", "[", 
+                    RowBox[{"1", ",", "var"}], "]"}]}], "*", 
+                    RowBox[{"(", 
+                    RowBox[{"total", "-", "var"}], ")"}]}], "]"}], ",", 
+                  RowBox[{"{", 
+                   RowBox[{"Infinity", ",", "2"}], "}"}]}], "]"}], ",", 
+                RowBox[{"UpdateInterval", "\[Rule]", "1"}]}], "]"}], ",", 
+              "\"\<Text\>\"", ",", 
+              RowBox[{"ShowStringCharacters", "\[Rule]", "False"}]}], "]"}], 
+            ",", "\[IndentingNewLine]", 
+            RowBox[{"TextCell", "[", 
+             RowBox[{"\"\<    Elapsed:  \>\"", ",", "\"\<Text\>\""}], "]"}], 
+            ",", "\[IndentingNewLine]", 
+            RowBox[{"TextCell", "[", 
+             RowBox[{
+              RowBox[{"Dynamic", "[", 
+               RowBox[{
+                RowBox[{"NumberForm", "[", 
+                 RowBox[{
+                  RowBox[{"formatTimeFromSeconds", "[", 
+                   RowBox[{"(", 
+                    RowBox[{
+                    RowBox[{"AbsoluteTime", "[", "]"}], "-", "now"}], ")"}], 
+                   "]"}], ",", 
+                  RowBox[{"{", 
+                   RowBox[{"Infinity", ",", "2"}], "}"}]}], "]"}], ",", 
+                RowBox[{"UpdateInterval", "\[Rule]", "0.99"}]}], "]"}], ",", 
+              "\"\<Text\>\"", ",", 
+              RowBox[{"ShowStringCharacters", "\[Rule]", "False"}]}], "]"}]}],
+            "\[IndentingNewLine]", "}"}], "]"}], "}"}], "]"}], "]"}]}], 
+     "\[IndentingNewLine]", "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"MultiNeuronSimulation", "[", 
+     RowBox[{
+     "\[Tau]_", ",", "h_", ",", "a_", ",", "weightMatrix_", ",", "hasReset_", 
+      ",", "eventCount_"}], "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"n", "=", 
+         RowBox[{"Length", "[", "weightMatrix", "]"}]}], ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"eventRecords", "=", 
+         RowBox[{"{", "}"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"eventIdRecords", "=", 
+         RowBox[{"{", "}"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"eventTimeRecords", "=", 
+         RowBox[{"{", "}"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"xRecords", "=", 
+         RowBox[{"{", "}"}]}], ",", "\[IndentingNewLine]", "x0", ",", 
+        "\[Beta]", ",", "idx", ",", "\[IndentingNewLine]", "spikeTimes", ",", 
+        "minId", ",", "minTime", ",", "\[IndentingNewLine]", 
+        RowBox[{"wmat", "=", 
+         RowBox[{"zeroDiagonal", "@", "weightMatrix"}]}], ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"$monitor", "=", "0"}]}], "\[IndentingNewLine]", "}"}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"idx", "=", 
+        RowBox[{"Table", "[", 
+         RowBox[{
+          RowBox[{"Cases", "[", 
+           RowBox[{
+            RowBox[{"Range", "[", 
+             RowBox[{"1", ",", "n"}], "]"}], ",", 
+            RowBox[{"Except", "[", "i", "]"}]}], "]"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"i", ",", "1", ",", "n"}], "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"x0", "=", 
+        RowBox[{"RandomReal", "[", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"-", "0.05"}], ",", "0.05"}], "}"}], ",", "n"}], "]"}]}], 
+       ";", "\[IndentingNewLine]", 
+       RowBox[{"showProgressBar", "[", 
+        RowBox[{
+         RowBox[{"Dynamic", "[", "$monitor", "]"}], ",", "eventCount", ",", 
+         "\"\<Simulation progress:\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+       
+       RowBox[{"Do", "[", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"$monitor", "++"}], ";", "\[IndentingNewLine]", 
+          RowBox[{"(*", 
+           RowBox[{
+            RowBox[{"spikeTimes", "=", 
+             RowBox[{"Map", "[", 
+              RowBox[{
+               RowBox[{
+                RowBox[{"PoissonSampler", "[", 
+                 RowBox[{"\[Tau]", ",", "h", ",", "a", ",", "#"}], "]"}], 
+                "&"}], ",", "x0"}], "]"}]}], ";"}], "*)"}], 
+          "\[IndentingNewLine]", 
+          RowBox[{"spikeTimes", "=", 
+           RowBox[{"PoissonSampler", "[", 
+            RowBox[{"\[Tau]", ",", "h", ",", "a", ",", "x0"}], "]"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"minId", ",", "minTime"}], "}"}], "=", 
+           RowBox[{"MinAndPosition", "[", "spikeTimes", "]"}]}], ";", 
+          "\[IndentingNewLine]", "\[IndentingNewLine]", 
+          RowBox[{"x0", "=", 
+           RowBox[{
+            RowBox[{"x0", " ", 
+             RowBox[{"Exp", "[", 
+              RowBox[{
+               RowBox[{"-", "minTime"}], "/", "\[Tau]"}], "]"}]}], "+", 
+            RowBox[{"wmat", "[", 
+             RowBox[{"[", 
+              RowBox[{"All", ",", "minId"}], "]"}], "]"}]}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"If", "[", 
+           RowBox[{"hasReset", ",", "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"x0", "[", 
+               RowBox[{"[", "minId", "]"}], "]"}], "=", "0."}], ";"}]}], 
+           "\[IndentingNewLine]", "]"}], ";", "\[IndentingNewLine]", 
+          RowBox[{"eventIdRecords", "=", 
+           RowBox[{"{", 
+            RowBox[{"eventIdRecords", ",", "minId"}], "}"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"eventTimeRecords", "=", 
+           RowBox[{"{", 
+            RowBox[{"eventTimeRecords", ",", "minTime"}], "}"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"xRecords", "=", 
+           RowBox[{"{", 
+            RowBox[{"xRecords", ",", "x0"}], "}"}]}], ";"}], 
+         "\[IndentingNewLine]", ",", 
+         RowBox[{"{", "eventCount", "}"}]}], "]"}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"eventTimeRecords", "=", 
+        RowBox[{"Accumulate", "@", 
+         RowBox[{"Flatten", "[", "eventTimeRecords", "]"}]}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"eventRecords", "=", 
+        RowBox[{"Thread", "[", 
+         RowBox[{"{", 
+          RowBox[{"eventTimeRecords", ",", 
+           RowBox[{"Flatten", "@", "eventIdRecords"}], ",", 
+           RowBox[{"Partition", "[", 
+            RowBox[{
+             RowBox[{"Flatten", "@", "xRecords"}], ",", "n"}], "]"}]}], "}"}],
+          "]"}]}]}]}], "\[IndentingNewLine]", "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"MultiNeuronSimulationWithInjection", "[", 
+     RowBox[{
+     "\[Tau]_", ",", "h_", ",", "a_", ",", "weightMatrix_", ",", "hasReset_", 
+      ",", "eventCount_", ",", "injection_"}], "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"n", "=", 
+         RowBox[{"Length", "[", "weightMatrix", "]"}]}], ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"eventRecords", "=", 
+         RowBox[{"{", "}"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"eventIdRecords", "=", 
+         RowBox[{"{", "}"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"eventTimeRecords", "=", 
+         RowBox[{"{", "}"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"xRecords", "=", 
+         RowBox[{"{", "}"}]}], ",", "\[IndentingNewLine]", "x0", ",", 
+        "\[Beta]", ",", "idx", ",", "\[IndentingNewLine]", "spikeTimes", ",", 
+        "minId", ",", "minTime", ",", "\[IndentingNewLine]", 
+        RowBox[{"wmat", "=", 
+         RowBox[{"zeroDiagonal", "@", "weightMatrix"}]}], ",", 
+        "\[IndentingNewLine]", "injectedId", ",", "injectionRates", ",", 
+        "injectionWeights", ",", "\[IndentingNewLine]", "injectionTimeList", 
+        ",", "minInjectionId", ",", "minInjectionTime", ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"$monitor", "=", "0"}]}], "\[IndentingNewLine]", "}"}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"idx", "=", 
+        RowBox[{"Table", "[", 
+         RowBox[{
+          RowBox[{"Cases", "[", 
+           RowBox[{
+            RowBox[{"Range", "[", 
+             RowBox[{"1", ",", "n"}], "]"}], ",", 
+            RowBox[{"Except", "[", "i", "]"}]}], "]"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"i", ",", "1", ",", "n"}], "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"x0", "=", 
+        RowBox[{"RandomReal", "[", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"-", "0.05"}], ",", "0.05"}], "}"}], ",", "n"}], "]"}]}], 
+       ";", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       "\[IndentingNewLine]", 
+       RowBox[{"injectedId", "=", 
+        RowBox[{"Flatten", "@", 
+         RowBox[{"MapThread", "[", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"ConstantArray", "[", 
+             RowBox[{"#1", ",", 
+              RowBox[{"If", "[", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"Depth", "[", "#2", "]"}], "\[Equal]", "3"}], ",", 
+                RowBox[{"Length", "[", "#2", "]"}], ",", "1"}], "]"}]}], 
+             "]"}], "&"}], ",", 
+           RowBox[{"{", 
+            RowBox[{
+             RowBox[{"Keys", "@", "injection"}], ",", 
+             RowBox[{"Values", "@", "injection"}]}], "}"}]}], "]"}]}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"injectionRates", ",", "injectionWeights"}], "}"}], "=", 
+        RowBox[{"Transpose", "@", 
+         RowBox[{"Partition", "[", 
+          RowBox[{
+           RowBox[{"Flatten", "[", 
+            RowBox[{"Values", "@", "injection"}], "]"}], ",", "2"}], 
+          "]"}]}]}], ";", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"showProgressBar", "[", 
+        RowBox[{
+         RowBox[{"Dynamic", "[", "$monitor", "]"}], ",", "eventCount", ",", 
+         "\"\<Simulation progress:\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+       
+       RowBox[{"While", "[", 
+        RowBox[{
+         RowBox[{"$monitor", "<", "eventCount"}], ",", "\[IndentingNewLine]", 
+         "\[IndentingNewLine]", 
+         RowBox[{"(*", 
+          RowBox[{
+           RowBox[{"spikeTimes", "=", 
+            RowBox[{"Map", "[", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"PoissonSampler", "[", 
+                RowBox[{"\[Tau]", ",", "h", ",", "a", ",", "#"}], "]"}], 
+               "&"}], ",", "x0"}], "]"}]}], ";"}], "*)"}], 
+         "\[IndentingNewLine]", "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"injectionTimeList", "=", 
+           RowBox[{"sampleExponentialList", "[", "injectionRates", "]"}]}], 
+          ";", "\[IndentingNewLine]", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"minInjectionId", ",", "minInjectionTime"}], "}"}], "=", 
+           RowBox[{"MinAndPosition", "[", "injectionTimeList", "]"}]}], ";", 
+          "\[IndentingNewLine]", "\[IndentingNewLine]", 
+          RowBox[{"spikeTimes", "=", 
+           RowBox[{"PoissonSampler", "[", 
+            RowBox[{"\[Tau]", ",", "h", ",", "a", ",", "x0"}], "]"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"minId", ",", "minTime"}], "}"}], "=", 
+           RowBox[{"MinAndPosition", "[", "spikeTimes", "]"}]}], ";", 
+          "\[IndentingNewLine]", "\[IndentingNewLine]", 
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{"minInjectionTime", "<", "minTime"}], ",", 
+            "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{"x0", "=", 
+              RowBox[{"x0", " ", 
+               RowBox[{"Exp", "[", 
+                RowBox[{
+                 RowBox[{"-", "minInjectionTime"}], "/", "\[Tau]"}], 
+                "]"}]}]}], ";", "\[IndentingNewLine]", 
+             RowBox[{"Quiet", "[", "\[IndentingNewLine]", 
+              RowBox[{
+               RowBox[{
+                RowBox[{"x0", "[", 
+                 RowBox[{"[", 
+                  RowBox[{"injectedId", "[", 
+                   RowBox[{"[", "minInjectionId", "]"}], "]"}], "]"}], "]"}], 
+                "+=", 
+                RowBox[{"injectionWeights", "[", 
+                 RowBox[{"[", "minInjectionId", "]"}], "]"}]}], ",", 
+               RowBox[{"General", "::", "munfl"}]}], "]"}], ";", 
+             "\[IndentingNewLine]", 
+             RowBox[{"eventIdRecords", "=", 
+              RowBox[{"{", 
+               RowBox[{"eventIdRecords", ",", 
+                RowBox[{"-", 
+                 RowBox[{"injectedId", "[", 
+                  RowBox[{"[", "minInjectionId", "]"}], "]"}]}]}], "}"}]}], 
+             ";", "\[IndentingNewLine]", 
+             RowBox[{"eventTimeRecords", "=", 
+              RowBox[{"{", 
+               RowBox[{"eventTimeRecords", ",", "minInjectionTime"}], "}"}]}],
+              ";"}], "\[IndentingNewLine]", ",", "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{"$monitor", "++"}], ";", "\[IndentingNewLine]", 
+             RowBox[{"x0", "=", 
+              RowBox[{
+               RowBox[{"x0", " ", 
+                RowBox[{"Exp", "[", 
+                 RowBox[{
+                  RowBox[{"-", "minTime"}], "/", "\[Tau]"}], "]"}]}], "+", 
+               RowBox[{"wmat", "[", 
+                RowBox[{"[", 
+                 RowBox[{"All", ",", "minId"}], "]"}], "]"}]}]}], ";", 
+             "\[IndentingNewLine]", 
+             RowBox[{"If", "[", 
+              RowBox[{"hasReset", ",", "\[IndentingNewLine]", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"x0", "[", 
+                  RowBox[{"[", "minId", "]"}], "]"}], "=", "0."}], ";"}]}], 
+              "\[IndentingNewLine]", "]"}], ";", "\[IndentingNewLine]", 
+             RowBox[{"eventIdRecords", "=", 
+              RowBox[{"{", 
+               RowBox[{"eventIdRecords", ",", "minId"}], "}"}]}], ";", 
+             "\[IndentingNewLine]", 
+             RowBox[{"eventTimeRecords", "=", 
+              RowBox[{"{", 
+               RowBox[{"eventTimeRecords", ",", "minTime"}], "}"}]}], ";"}]}],
+            "\[IndentingNewLine]", "]"}], ";", "\[IndentingNewLine]", 
+          RowBox[{"xRecords", "=", 
+           RowBox[{"{", 
+            RowBox[{"xRecords", ",", "x0"}], "}"}]}], ";"}]}], 
+        "\[IndentingNewLine]", "]"}], ";", "\[IndentingNewLine]", 
+       RowBox[{"eventTimeRecords", "=", 
+        RowBox[{"Accumulate", "@", 
+         RowBox[{"Flatten", "[", "eventTimeRecords", "]"}]}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"eventRecords", "=", 
+        RowBox[{"Thread", "[", 
+         RowBox[{"{", 
+          RowBox[{"eventTimeRecords", ",", 
+           RowBox[{"Flatten", "@", "eventIdRecords"}], ",", 
+           RowBox[{"Partition", "[", 
+            RowBox[{
+             RowBox[{"Flatten", "@", "xRecords"}], ",", "n"}], "]"}]}], "}"}],
+          "]"}]}]}]}], "\[IndentingNewLine]", "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"MultiNeuronTrials", "[", 
+     RowBox[{
+     "\[Tau]_", ",", "h_", ",", "a_", ",", "weightMatrix_", ",", "hasReset_", 
+      ",", "eventCount_", ",", "trials_"}], "]"}], ":=", 
+    "\[IndentingNewLine]", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", "rates", "}"}], ",", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"rates", "=", 
+        RowBox[{"ParallelTable", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{
+            RowBox[{"NeuronMeanFiringRate", "[", 
+             RowBox[{
+              RowBox[{"MultiNeuronSimulation", "[", 
+               RowBox[{
+               "\[Tau]", ",", "h", ",", "a", ",", "weightMatrix", ",", 
+                "hasReset", ",", "eventCount"}], "]"}], ",", "#"}], "]"}], 
+            "&"}], "/@", 
+           RowBox[{"Range", "[", 
+            RowBox[{"1", ",", 
+             RowBox[{"Length", "[", "weightMatrix", "]"}]}], "]"}]}], ",", 
+          RowBox[{"{", "trials", "}"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"Transpose", "@", "rates"}]}]}], "\[IndentingNewLine]", 
+     "]"}]}], ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"NeuronMeanFiringRate", "[", 
+     RowBox[{"records_", ",", 
+      RowBox[{"channel_", ":", "0"}]}], "]"}], ":=", 
+    RowBox[{"If", "[", 
+     RowBox[{
+      RowBox[{"ListQ", "[", "channel", "]"}], ",", "\[IndentingNewLine]", 
+      RowBox[{"Mean", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"NeuronMeanFiringRate", "[", 
+          RowBox[{"records", ",", "#"}], "]"}], "&"}], "/@", "channel"}], 
+       "]"}], "\[IndentingNewLine]", ",", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"If", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"Length", "[", "#", "]"}], "\[Equal]", "0"}], ",", "0.", 
+          ",", 
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"Length", "[", "#", "]"}], "\[Equal]", "1"}], ",", 
+            RowBox[{"1", "/", 
+             RowBox[{"(", 
+              RowBox[{"#", "[", 
+               RowBox[{"[", 
+                RowBox[{
+                 RowBox[{"-", "1"}], ",", "1"}], "]"}], "]"}], ")"}]}], ",", 
+            RowBox[{
+             RowBox[{"(", 
+              RowBox[{
+               RowBox[{"Length", "[", "#", "]"}], "-", "1"}], ")"}], "/", 
+             RowBox[{"(", 
+              RowBox[{
+               RowBox[{"#", "[", 
+                RowBox[{"[", 
+                 RowBox[{
+                  RowBox[{"-", "1"}], ",", "1"}], "]"}], "]"}], "-", 
+               RowBox[{"#", "[", 
+                RowBox[{"[", 
+                 RowBox[{"1", ",", "1"}], "]"}], "]"}]}], ")"}]}]}], "]"}]}], 
+         "]"}], "&"}], "@", 
+       RowBox[{"Select", "[", 
+        RowBox[{"records", ",", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"#", "[", 
+            RowBox[{"[", "2", "]"}], "]"}], "\[Equal]", "channel"}], "&"}]}], 
+        "]"}]}]}], "\[IndentingNewLine]", "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"NeuronMeanFiringRateSecondMoment", "[", 
+     RowBox[{"records_", ",", "averageWindow_Integer", ",", 
+      RowBox[{"channel_", ":", "0"}]}], "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"events", ",", "aveWindow", ",", 
+        RowBox[{"nChannel", "=", "1"}]}], "}"}], ",", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"Print", "[", "\"\<THIS FUNCTION IS NOT DONE!!!\>\"", "]"}], 
+       ";", "\[IndentingNewLine]", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{"ListQ", "[", "channel", "]"}], ",", "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"events", "=", 
+           RowBox[{
+            RowBox[{"Select", "[", 
+             RowBox[{"records", ",", 
+              RowBox[{
+               RowBox[{"MemberQ", "[", 
+                RowBox[{"channel", ",", 
+                 RowBox[{"#", "[", 
+                  RowBox[{"[", "2", "]"}], "]"}]}], "]"}], "&"}]}], "]"}], 
+            "[", 
+            RowBox[{"[", 
+             RowBox[{"All", ",", "1"}], "]"}], "]"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"nChannel", "=", 
+           RowBox[{"Length", "[", "channel", "]"}]}], ";"}], 
+         "\[IndentingNewLine]", ",", "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"events", "=", 
+           RowBox[{
+            RowBox[{"Select", "[", 
+             RowBox[{"records", ",", 
+              RowBox[{
+               RowBox[{
+                RowBox[{"#", "[", 
+                 RowBox[{"[", "2", "]"}], "]"}], "\[Equal]", "channel"}], 
+               "&"}]}], "]"}], "[", 
+            RowBox[{"[", 
+             RowBox[{"All", ",", "1"}], "]"}], "]"}]}], ";"}]}], 
+        "\[IndentingNewLine]", "]"}], ";", "\[IndentingNewLine]", 
+       RowBox[{"aveWindow", "=", 
+        RowBox[{"Min", "[", 
+         RowBox[{
+          RowBox[{"Length", "[", "events", "]"}], ",", "averageWindow"}], 
+         "]"}]}], ";", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"Differences", "[", 
+           RowBox[{"Prepend", "[", 
+            RowBox[{
+             RowBox[{"events", "[", 
+              RowBox[{"[", 
+               RowBox[{";;", 
+                RowBox[{"-", "aveWindow"}]}], "]"}], "]"}], ",", "0"}], "]"}],
+            "]"}], ".", "\[IndentingNewLine]", 
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"aveWindow", "/", "nChannel"}], "/", 
+             RowBox[{"Differences", "[", 
+              RowBox[{
+               RowBox[{"Prepend", "[", 
+                RowBox[{"events", ",", "0."}], "]"}], ",", "1", ",", 
+               "aveWindow"}], "]"}]}], ")"}], "^", "2"}]}], ")"}], "/", 
+        RowBox[{"events", "[", 
+         RowBox[{"[", 
+          RowBox[{"-", "aveWindow"}], "]"}], "]"}]}]}]}], 
+     "\[IndentingNewLine]", "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"NeuronMeanFiringRateMoving", "[", 
+     RowBox[{"records_", ",", "averageWindow_Integer", ",", 
+      RowBox[{"channel_", ":", "0"}]}], "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"events", ",", "aveWindow", ",", 
+        RowBox[{"nChannel", "=", "1"}]}], "}"}], ",", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{"ListQ", "[", "channel", "]"}], ",", "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"events", "=", 
+           RowBox[{
+            RowBox[{"Select", "[", 
+             RowBox[{"records", ",", 
+              RowBox[{
+               RowBox[{"MemberQ", "[", 
+                RowBox[{"channel", ",", 
+                 RowBox[{"#", "[", 
+                  RowBox[{"[", "2", "]"}], "]"}]}], "]"}], "&"}]}], "]"}], 
+            "[", 
+            RowBox[{"[", 
+             RowBox[{"All", ",", "1"}], "]"}], "]"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"nChannel", "=", 
+           RowBox[{"Length", "[", "channel", "]"}]}], ";"}], 
+         "\[IndentingNewLine]", ",", "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"events", "=", 
+           RowBox[{
+            RowBox[{"Select", "[", 
+             RowBox[{"records", ",", 
+              RowBox[{
+               RowBox[{
+                RowBox[{"#", "[", 
+                 RowBox[{"[", "2", "]"}], "]"}], "\[Equal]", "channel"}], 
+               "&"}]}], "]"}], "[", 
+            RowBox[{"[", 
+             RowBox[{"All", ",", "1"}], "]"}], "]"}]}], ";"}]}], 
+        "\[IndentingNewLine]", "]"}], ";", "\[IndentingNewLine]", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Length", "[", "events", "]"}], "===", "0"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"{", 
+           RowBox[{"0.", ",", "0."}], "}"}], "}"}], ",", 
+         "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"aveWindow", "=", 
+           RowBox[{"Min", "[", 
+            RowBox[{
+             RowBox[{"Length", "[", "events", "]"}], ",", "averageWindow"}], 
+            "]"}]}], ";", "\[IndentingNewLine]", 
+          RowBox[{"Thread", "[", 
+           RowBox[{"{", "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{"events", "[", 
+              RowBox[{"[", 
+               RowBox[{";;", 
+                RowBox[{"-", "aveWindow"}]}], "]"}], "]"}], ",", 
+             "\[IndentingNewLine]", 
+             RowBox[{
+              RowBox[{"aveWindow", "/", "nChannel"}], "/", 
+              RowBox[{"Differences", "[", 
+               RowBox[{
+                RowBox[{"Prepend", "[", 
+                 RowBox[{"events", ",", "0."}], "]"}], ",", "1", ",", 
+                "aveWindow"}], "]"}]}]}], "\[IndentingNewLine]", "}"}], 
+           "]"}]}]}], "\[IndentingNewLine]", "]"}]}]}], "\[IndentingNewLine]",
+      "]"}]}], ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"NeuronMeanFiringRateMovingFunction", "[", 
+     RowBox[{"records_", ",", "averageWindow_Integer", ",", "channel_"}], 
+     "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"ratesGroup", ",", "maxTime", ",", "ratesFunction"}], "}"}], 
+      ",", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"maxTime", "=", 
+        RowBox[{"records", "[", 
+         RowBox[{"[", 
+          RowBox[{
+           RowBox[{"-", "1"}], ",", "1"}], "]"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"ratesGroup", "=", 
+        RowBox[{"NeuronMeanFiringRateMoving", "[", 
+         RowBox[{"records", ",", "averageWindow", ",", "channel"}], "]"}]}], 
+       ";", "\[IndentingNewLine]", 
+       RowBox[{"ratesGroup", "=", 
+        RowBox[{"Join", "[", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{
+              RowBox[{"-", "0.00001"}], ",", "0"}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"ratesGroup", "[", 
+                RowBox[{"[", 
+                 RowBox[{"1", ",", "1"}], "]"}], "]"}], "-", "0.0000001"}], 
+              ",", "0"}], "}"}]}], "}"}], ",", "ratesGroup", ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"ratesGroup", "[", 
+                RowBox[{"[", 
+                 RowBox[{
+                  RowBox[{"-", "1"}], ",", "1"}], "]"}], "]"}], "+", 
+               "0.0000001"}], ",", "0"}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"maxTime", ",", "0"}], "}"}]}], "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"ratesFunction", "[", "t_", "]"}], "=", 
+        RowBox[{
+         RowBox[{"Interpolation", "[", 
+          RowBox[{"ratesGroup", ",", 
+           RowBox[{"InterpolationOrder", "\[Rule]", "1"}]}], "]"}], "[", "t", 
+         "]"}]}], ";", "\[IndentingNewLine]", "ratesFunction"}]}], 
+     "\[IndentingNewLine]", "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"NeuronMeanFiringRateGaussian", "[", 
+     RowBox[{"records_", ",", "sigma_", ",", 
+      RowBox[{"channel_", ":", "0"}]}], "]"}], ":=", "\[IndentingNewLine]", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"times", ",", "rate"}], "}"}], ",", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"times", "=", 
+        RowBox[{
+         RowBox[{"Select", "[", 
+          RowBox[{"records", ",", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"#", "[", 
+              RowBox[{"[", "2", "]"}], "]"}], "\[Equal]", "channel"}], 
+            "&"}]}], "]"}], "[", 
+         RowBox[{"[", 
+          RowBox[{"All", ",", "1"}], "]"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"rate", "[", "t_", "]"}], "=", 
+        RowBox[{
+         RowBox[{"Sum", "[", 
+          RowBox[{
+           RowBox[{"Exp", "[", 
+            RowBox[{
+             RowBox[{"-", 
+              RowBox[{
+               RowBox[{"(", 
+                RowBox[{"t", "-", "\[Tau]"}], ")"}], "^", "2"}]}], "/", 
+             RowBox[{"(", 
+              RowBox[{"2", 
+               RowBox[{"sigma", "^", "2"}]}], ")"}]}], "]"}], ",", 
+           RowBox[{"{", 
+            RowBox[{"\[Tau]", ",", "times"}], "}"}]}], "]"}], "/", 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"Sqrt", "[", 
+            RowBox[{"2", "\[Pi]"}], "]"}], "sigma"}], ")"}]}]}], ";", 
+       "\[IndentingNewLine]", "rate"}]}], "\[IndentingNewLine]", "]"}]}], 
+   ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"NeuronSpikes", "[", 
+     RowBox[{"records_", ",", "nNeurons_"}], "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", "asso", "}"}], ",", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"asso", "=", 
+        RowBox[{"KeySort", "@", 
+         RowBox[{"GroupBy", "[", 
+          RowBox[{
+           RowBox[{"records", "[", 
+            RowBox[{"[", 
+             RowBox[{"All", ",", 
+              RowBox[{";;", "2"}]}], "]"}], "]"}], ",", "Last"}], "]"}]}]}], 
+       ";", "\[IndentingNewLine]", 
+       RowBox[{"Table", "[", 
+        RowBox[{
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{"KeyExistsQ", "[", 
+            RowBox[{"asso", ",", "k"}], "]"}], ",", 
+           RowBox[{
+            RowBox[{"asso", "[", "k", "]"}], "[", 
+            RowBox[{"[", 
+             RowBox[{"All", ",", "1"}], "]"}], "]"}], ",", 
+           RowBox[{"{", "}"}]}], "]"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"k", ",", "1", ",", "nNeurons"}], "}"}]}], "]"}]}]}], 
+     "\[IndentingNewLine]", "]"}]}], ";"}], "\[IndentingNewLine]", 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"SingleNeuronSimulationUntilStationary", "[", 
+     RowBox[{
+     "\[Tau]_", ",", "h_", ",", "a_", ",", "inputRates_", ",", 
+      "inputWeights_", ",", "hasReset_", ",", "batchSize_", ",", 
+      "onlyKeepStationary_", ",", 
+      RowBox[{"keepCount_", ":", "5"}]}], "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"x0", "=", "0."}], ",", 
+        RowBox[{"lastT", "=", "0."}], ",", "record", ",", 
+        RowBox[{"recordList", "=", 
+         RowBox[{"{", "}"}]}], ",", "ts", ",", "division", ",", "t0", ",", 
+        "t1", ",", "dt", ",", "times", ",", "discretTS", ",", 
+        RowBox[{"ut", "=", "1."}], ",", 
+        RowBox[{"thres", "=", "0.05"}]}], "}"}], ",", "\[IndentingNewLine]", 
+      "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"While", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"onlyKeepStationary", " ", "&&", 
+            RowBox[{
+             RowBox[{"Length", "[", "recordList", "]"}], "<", "keepCount"}]}],
+            ")"}], "||", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"!", "onlyKeepStationary"}], "&&", " ", 
+            RowBox[{"ut", ">", "thres"}]}], ")"}]}], ",", 
+         "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"record", "=", 
+           RowBox[{"SingleNeuronSimulation", "[", 
+            RowBox[{
+            "\[Tau]", ",", "h", ",", "a", ",", "inputRates", ",", 
+             "inputWeights", ",", "hasReset", ",", "batchSize", ",", "x0"}], 
+            "]"}]}], ";", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+          RowBox[{"ts", "=", 
+           RowBox[{"TimeSeries", "@", 
+            RowBox[{"NeuronMeanFiringRateMoving", "[", 
+             RowBox[{"record", ",", "100", ",", "0"}], "]"}]}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"division", "=", "batchSize"}], ";", "\[IndentingNewLine]", 
+          
+          RowBox[{"t0", "=", 
+           RowBox[{"ts", "[", "\"\<FirstTime\>\"", "]"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"t1", "=", 
+           RowBox[{"ts", "[", "\"\<LastTime\>\"", "]"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"dt", "=", 
+           RowBox[{
+            RowBox[{"(", 
+             RowBox[{"t1", "-", "t0"}], ")"}], "/", "division"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"times", "=", 
+           RowBox[{"Table", "[", 
+            RowBox[{
+             RowBox[{"t0", "+", 
+              RowBox[{"i", " ", "dt"}]}], ",", 
+             RowBox[{"{", 
+              RowBox[{"i", ",", "0", ",", "division"}], "}"}]}], "]"}]}], ";",
+           "\[IndentingNewLine]", 
+          RowBox[{"discretTS", "=", 
+           RowBox[{"ts", "[", "times", "]"}]}], ";", "\[IndentingNewLine]", 
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"Variance", "[", "discretTS", "]"}], "<", "0.01"}], ",", 
+            "\[IndentingNewLine]", 
+            RowBox[{"ut", "=", "0"}], ",", "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{"ut", "=", 
+              RowBox[{"Min", "@", 
+               RowBox[{"UnitRootTest", "[", 
+                RowBox[{"discretTS", ",", "\"\<Constant\>\"", ",", "All"}], 
+                "]"}]}]}], ";"}]}], "\[IndentingNewLine]", "]"}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"If", "[", 
+           RowBox[{"onlyKeepStationary", ",", "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{"If", "[", 
+              RowBox[{
+               RowBox[{"ut", "<", "thres"}], ",", "\[IndentingNewLine]", 
+               RowBox[{
+                RowBox[{"AppendTo", "[", 
+                 RowBox[{"recordList", ",", 
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"#", "[", 
+                    RowBox[{"[", "1", "]"}], "]"}], "+", "lastT"}], ",", 
+                    RowBox[{"#", "[", 
+                    RowBox[{"[", "2", "]"}], "]"}], ",", 
+                    RowBox[{"#", "[", 
+                    RowBox[{"[", "3", "]"}], "]"}]}], "}"}], "&"}], "/@", 
+                   "record"}]}], "]"}], ";"}]}], "\[IndentingNewLine]", "]"}],
+              ";"}], ",", "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{"AppendTo", "[", 
+              RowBox[{"recordList", ",", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"{", 
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{"#", "[", 
+                    RowBox[{"[", "1", "]"}], "]"}], "+", "lastT"}], ",", 
+                   RowBox[{"#", "[", 
+                    RowBox[{"[", "2", "]"}], "]"}], ",", 
+                   RowBox[{"#", "[", 
+                    RowBox[{"[", "3", "]"}], "]"}]}], "}"}], "&"}], "/@", 
+                "record"}]}], "]"}], ";"}]}], "\[IndentingNewLine]", "]"}], 
+          ";", "\[IndentingNewLine]", 
+          RowBox[{"x0", "=", 
+           RowBox[{"record", "[", 
+            RowBox[{"[", 
+             RowBox[{
+              RowBox[{"-", "1"}], ",", "3"}], "]"}], "]"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"lastT", "=", 
+           RowBox[{"lastT", "+", 
+            RowBox[{"record", "[", 
+             RowBox[{"[", 
+              RowBox[{
+               RowBox[{"-", "1"}], ",", "1"}], "]"}], "]"}]}]}], ";"}]}], 
+        "\[IndentingNewLine]", "]"}], ";", "\[IndentingNewLine]", 
+       "recordList"}]}], "\[IndentingNewLine]", "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"SingleNeuronSimulationStationary", "[", 
+     RowBox[{
+     "\[Tau]_", ",", "h_", ",", "a_", ",", "inputRates_", ",", 
+      "inputWeights_", ",", "hasReset_", ",", "eventCount_"}], "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"recordList", ",", "x0"}], "}"}], ",", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"recordList", "=", 
+        RowBox[{"SingleNeuronSimulationUntilStationary", "[", 
+         RowBox[{
+         "\[Tau]", ",", "h", ",", "a", ",", "inputRates", ",", "inputWeights",
+           ",", "hasReset", ",", "5000", ",", "False"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"x0", "=", 
+        RowBox[{"recordList", "[", 
+         RowBox[{"[", 
+          RowBox[{
+           RowBox[{"-", "1"}], ",", 
+           RowBox[{"-", "1"}], ",", "3"}], "]"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"SingleNeuronSimulation", "[", 
+        RowBox[{
+        "\[Tau]", ",", "h", ",", "a", ",", "inputRates", ",", "inputWeights", 
+         ",", "hasReset", ",", "eventCount", ",", "x0"}], "]"}]}]}], 
+     "\[IndentingNewLine]", "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"SingleNeuronSimulationStationaryTrials", "[", 
+     RowBox[{
+     "\[Tau]_", ",", "h_", ",", "a_", ",", "inputRates_", ",", 
+      "inputWeights_", ",", "hasReset_", ",", "eventCount_", ",", "trials_"}],
+      "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"recordList", ",", "x0"}], "}"}], ",", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"recordList", "=", 
+        RowBox[{"SingleNeuronSimulationUntilStationary", "[", 
+         RowBox[{
+         "\[Tau]", ",", "h", ",", "a", ",", "inputRates", ",", "inputWeights",
+           ",", "hasReset", ",", "5000", ",", "False"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"x0", "=", 
+        RowBox[{"recordList", "[", 
+         RowBox[{"[", 
+          RowBox[{
+           RowBox[{"-", "1"}], ",", 
+           RowBox[{"-", "1"}], ",", "3"}], "]"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"SingleNeuronTrials", "[", 
+        RowBox[{
+        "\[Tau]", ",", "h", ",", "a", ",", "inputRates", ",", "inputWeights", 
+         ",", "hasReset", ",", "eventCount", ",", "trials", ",", "x0"}], 
+        "]"}]}]}], "\[IndentingNewLine]", "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"SingleNeuronSimulationMomentsOfX", "[", 
+    RowBox[{
+    "\[Tau]_", ",", "h_", ",", "a_", ",", "inputRates_", ",", "inputWeights_",
+      ",", "eventCount_", ",", 
+     RowBox[{"orderUpTo_", ":", "2"}]}], "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"ts", ",", "ids", ",", "xs", ",", "dt"}], "}"}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"ts", ",", "ids", ",", "xs"}], "}"}], "=", 
+       RowBox[{"Transpose", "@", 
+        RowBox[{"SingleNeuronSimulation", "[", 
+         RowBox[{
+         "\[Tau]", ",", "h", ",", "a", ",", "inputRates", ",", "inputWeights",
+           ",", "True", ",", "eventCount"}], "]"}]}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"dt", "=", 
+       RowBox[{"Differences", "[", "ts", "]"}]}], ";", "\[IndentingNewLine]", 
+      
+      RowBox[{"Table", "[", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Total", "[", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"xs", "[", 
+             RowBox[{"[", 
+              RowBox[{";;", 
+               RowBox[{"-", "2"}]}], "]"}], "]"}], "^", "k"}], "*", 
+           RowBox[{"\[Tau]", "/", "k"}], "*", 
+           RowBox[{"(", 
+            RowBox[{"1", "-", 
+             RowBox[{"Exp", "[", 
+              RowBox[{
+               RowBox[{"-", "dt"}], "*", 
+               RowBox[{"k", "/", "\[Tau]"}]}], "]"}]}], ")"}]}], "]"}], "/", 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"ts", "[", 
+            RowBox[{"[", 
+             RowBox[{"-", "1"}], "]"}], "]"}], "-", 
+           RowBox[{"ts", "[", 
+            RowBox[{"[", "1", "]"}], "]"}]}], ")"}]}], ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"{", 
+         RowBox[{"k", ",", "1", ",", "orderUpTo"}], "}"}]}], "]"}]}]}], 
+    "\[IndentingNewLine]", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"SingleNeuronSimulationMomentsOfXUntilSpikeCount", "[", 
+     RowBox[{
+     "\[Tau]_", ",", "h_", ",", "a_", ",", "inputRates_", ",", 
+      "inputWeights_", ",", "spikeCount_", ",", 
+      RowBox[{"orderUpTo_", ":", "2"}]}], "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"ts", ",", "ids", ",", "xs", ",", "dt"}], "}"}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"ts", ",", "ids", ",", "xs"}], "}"}], "=", 
+        RowBox[{"Transpose", "@", 
+         RowBox[{"SingleNeuronSimulationUntilSpikeCount", "[", 
+          RowBox[{
+          "\[Tau]", ",", "h", ",", "a", ",", "inputRates", ",", 
+           "inputWeights", ",", "True", ",", "spikeCount"}], "]"}]}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"dt", "=", 
+        RowBox[{"Differences", "[", "ts", "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"Table", "[", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Total", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"xs", "[", 
+              RowBox[{"[", 
+               RowBox[{";;", 
+                RowBox[{"-", "2"}]}], "]"}], "]"}], "^", "k"}], "*", 
+            RowBox[{"\[Tau]", "/", "k"}], "*", 
+            RowBox[{"(", 
+             RowBox[{"1", "-", 
+              RowBox[{"Exp", "[", 
+               RowBox[{
+                RowBox[{"-", "dt"}], "*", 
+                RowBox[{"k", "/", "\[Tau]"}]}], "]"}]}], ")"}]}], "]"}], "/", 
+          
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"ts", "[", 
+             RowBox[{"[", 
+              RowBox[{"-", "1"}], "]"}], "]"}], "-", 
+            RowBox[{"ts", "[", 
+             RowBox[{"[", "1", "]"}], "]"}]}], ")"}]}], ",", 
+         "\[IndentingNewLine]", 
+         RowBox[{"{", 
+          RowBox[{"k", ",", "1", ",", "orderUpTo"}], "}"}]}], "]"}]}]}], 
+     "\[IndentingNewLine]", "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"SingleNeuronSimulationStationaryMomentsOfX", "[", 
+    RowBox[{
+    "\[Tau]_", ",", "h_", ",", "a_", ",", "inputRates_", ",", "inputWeights_",
+      ",", "eventCount_", ",", 
+     RowBox[{"orderUpTo_", ":", "2"}]}], "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"ts", ",", "ids", ",", "xs", ",", "dt"}], "}"}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"ts", ",", "ids", ",", "xs"}], "}"}], "=", 
+       RowBox[{"Transpose", "@", 
+        RowBox[{"SingleNeuronSimulationStationary", "[", 
+         RowBox[{
+         "\[Tau]", ",", "h", ",", "a", ",", "inputRates", ",", "inputWeights",
+           ",", "True", ",", "eventCount"}], "]"}]}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"dt", "=", 
+       RowBox[{"Differences", "[", "ts", "]"}]}], ";", "\[IndentingNewLine]", 
+      
+      RowBox[{"Table", "[", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Total", "[", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"xs", "[", 
+             RowBox[{"[", 
+              RowBox[{";;", 
+               RowBox[{"-", "2"}]}], "]"}], "]"}], "^", "k"}], "*", 
+           RowBox[{"\[Tau]", "/", "k"}], "*", 
+           RowBox[{"(", 
+            RowBox[{"1", "-", 
+             RowBox[{"Exp", "[", 
+              RowBox[{
+               RowBox[{"-", "dt"}], "*", 
+               RowBox[{"k", "/", "\[Tau]"}]}], "]"}]}], ")"}]}], "]"}], "/", 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"ts", "[", 
+            RowBox[{"[", 
+             RowBox[{"-", "1"}], "]"}], "]"}], "-", 
+           RowBox[{"ts", "[", 
+            RowBox[{"[", "1", "]"}], "]"}]}], ")"}]}], ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"{", 
+         RowBox[{"k", ",", "1", ",", "orderUpTo"}], "}"}]}], "]"}]}]}], 
+    "\[IndentingNewLine]", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"SingleNeuronSimulationMomentsOfXTrials", "[", 
+    RowBox[{
+    "\[Tau]_", ",", "h_", ",", "a_", ",", "inputRates_", ",", "inputWeights_",
+      ",", "eventCount_", ",", 
+     RowBox[{"orderUpTo_", ":", "2"}], ",", "trials_"}], "]"}], ":=", 
+   RowBox[{"Transpose", "@", 
+    RowBox[{"ParallelTable", "[", 
+     RowBox[{
+      RowBox[{"SingleNeuronSimulationMomentsOfX", "[", 
+       RowBox[{
+       "\[Tau]", ",", "h", ",", "a", ",", "inputRates", ",", "inputWeights", 
+        ",", "eventCount", ",", "orderUpTo"}], "]"}], ",", 
+      RowBox[{"{", "trials", "}"}]}], "]"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"SingleNeuronSimulationMoentsOfXUntilSpikeCountTrials", "[", 
+     RowBox[{
+     "\[Tau]_", ",", "h_", ",", "a_", ",", "inputRates_", ",", 
+      "inputWeights_", ",", "spikeCount_", ",", 
+      RowBox[{"orderUpTo_", ":", "2"}], ",", "trials_"}], "]"}], ":=", 
+    RowBox[{"Transpose", "@", 
+     RowBox[{"ParallelTable", "[", 
+      RowBox[{
+       RowBox[{"SingleNeuronSimulationMomentsOfXUntilSpikeCount", "[", 
+        RowBox[{
+        "\[Tau]", ",", "h", ",", "a", ",", "inputRates", ",", "inputWeights", 
+         ",", "spikeCount", ",", "orderUpTo"}], "]"}], ",", 
+       RowBox[{"{", "trials", "}"}]}], "]"}]}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"SingleNeuronSimulationStationaryMomentsOfXTrials", "[", 
+    RowBox[{
+    "\[Tau]_", ",", "h_", ",", "a_", ",", "inputRates_", ",", "inputWeights_",
+      ",", "eventCount_", ",", 
+     RowBox[{"orderUpTo_", ":", "2"}], ",", "trials_"}], "]"}], ":=", 
+   RowBox[{"Transpose", "@", 
+    RowBox[{"ParallelTable", "[", 
+     RowBox[{
+      RowBox[{"SingleNeuronSimulationStationaryMomentsOfX", "[", 
+       RowBox[{
+       "\[Tau]", ",", "h", ",", "a", ",", "inputRates", ",", "inputWeights", 
+        ",", "eventCount", ",", "orderUpTo"}], "]"}], ",", 
+      RowBox[{"{", "trials", "}"}]}], "]"}]}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.783010578857066*^9, 3.783010582314757*^9}, {
+   3.7830247937108335`*^9, 3.7830248388859873`*^9}, {3.7830370823207664`*^9, 
+   3.783037084871939*^9}, 3.789167279131299*^9, {3.789232791553722*^9, 
+   3.789232791893614*^9}, {3.78923392457514*^9, 3.789233941905376*^9}, {
+   3.789233984281385*^9, 3.789233986176848*^9}, {3.7892373583272676`*^9, 
+   3.789237380394121*^9}, {3.7892374466671057`*^9, 3.789237506637157*^9}, {
+   3.7892375993038*^9, 3.789237790270775*^9}, {3.789237868108315*^9, 
+   3.789237937892309*^9}, {3.789238024599442*^9, 3.7892380320255613`*^9}, {
+   3.789238124133645*^9, 3.7892382560338573`*^9}, {3.789238290226535*^9, 
+   3.7892382951800833`*^9}, {3.789238553231122*^9, 3.7892385743249817`*^9}, {
+   3.7892386972291927`*^9, 3.789238744624934*^9}, {3.78923882955052*^9, 
+   3.7892388585970297`*^9}, {3.789238907800915*^9, 3.789238924231782*^9}, {
+   3.789239702780178*^9, 3.789239705089984*^9}, {3.789239758110157*^9, 
+   3.789239801814517*^9}, {3.789239896154084*^9, 3.789239897711112*^9}, {
+   3.789239972722939*^9, 3.789240101953822*^9}, {3.7892401499267473`*^9, 
+   3.7892401517808323`*^9}, {3.789240186754966*^9, 3.789240197294795*^9}, {
+   3.789240407777128*^9, 3.789240422817916*^9}, {3.789240592169035*^9, 
+   3.7892405929958057`*^9}, {3.789241434719301*^9, 3.789241437999927*^9}, {
+   3.789241481693144*^9, 3.789241493959258*^9}, {3.789241538354982*^9, 
+   3.789241539464101*^9}, {3.789242342352152*^9, 3.789242343844549*^9}, {
+   3.7892423865587873`*^9, 3.789242387168453*^9}, {3.789915948715745*^9, 
+   3.789916010100239*^9}, {3.789916116308214*^9, 3.7899161548622227`*^9}, {
+   3.789916211593213*^9, 3.789916322401063*^9}, {3.789916478810453*^9, 
+   3.789916596448907*^9}, {3.78991993815282*^9, 3.78991994619357*^9}, {
+   3.7900165623353643`*^9, 3.790016607173469*^9}, {3.79008499388407*^9, 
+   3.790085000831653*^9}, {3.790514442823862*^9, 3.79051444931986*^9}, {
+   3.790514545062394*^9, 3.7905145460719223`*^9}, 3.7905146369353437`*^9, {
+   3.7905172092582893`*^9, 3.790517219953107*^9}, 3.8055442809209623`*^9, {
+   3.807278517703726*^9, 3.8072785198011503`*^9}, {3.809018439962946*^9, 
+   3.809018440780292*^9}, {3.8096490552045927`*^9, 3.809649079419715*^9}, {
+   3.8096492341819077`*^9, 3.8096492495907297`*^9}, {3.8096493253014364`*^9, 
+   3.809649376516492*^9}, {3.8096494327906537`*^9, 3.809649443175118*^9}, {
+   3.8096494998139095`*^9, 3.809649570077146*^9}, {3.8096496909418373`*^9, 
+   3.8096496937419205`*^9}, {3.8096497633340044`*^9, 3.809649763516779*^9}, {
+   3.8096499004545064`*^9, 3.809650070078223*^9}, {3.809650187710416*^9, 
+   3.809650227846587*^9}, {3.8096592214655027`*^9, 3.80965922284041*^9}, {
+   3.8096951629526296`*^9, 3.8096951648552637`*^9}, {3.809695257190339*^9, 
+   3.8096953227355185`*^9}, {3.8097850017664156`*^9, 3.809785008235791*^9}, {
+   3.8097856828944526`*^9, 3.8097856845814247`*^9}, {3.8097857287026978`*^9, 
+   3.8097857310140586`*^9}, {3.8097858134237704`*^9, 3.809785817392816*^9}, {
+   3.8097863115270395`*^9, 3.809786321264675*^9}, {3.809786441356229*^9, 
+   3.8097864430742445`*^9}, {3.8097865189940805`*^9, 3.809786661890681*^9}, {
+   3.809786699936761*^9, 3.809786719247877*^9}, {3.8097867520086193`*^9, 
+   3.8097868024643497`*^9}, {3.8097868495132494`*^9, 
+   3.8097868724655128`*^9}, {3.8097877523218*^9, 3.809787789792919*^9}, 
+   3.8097878494982214`*^9, 3.8097879834834356`*^9, {3.809788186985264*^9, 
+   3.8097881970662527`*^9}, {3.8097890642403865`*^9, 3.809789069116021*^9}, {
+   3.809796253129239*^9, 3.8097962565127573`*^9}, 3.8097962899544687`*^9, {
+   3.8097964472218094`*^9, 3.8097965155778913`*^9}, {3.809971602440875*^9, 
+   3.8099716040827007`*^9}, {3.810051143674811*^9, 3.81005114468604*^9}, {
+   3.81005129229086*^9, 3.8100512933698483`*^9}, {3.810051700419972*^9, 
+   3.8100517019229527`*^9}, {3.810052076522595*^9, 3.810052077808922*^9}, {
+   3.8100521804808903`*^9, 3.81005218235501*^9}, {3.8100522442920113`*^9, 
+   3.8100523086922007`*^9}, {3.810055449865251*^9, 3.810055460552549*^9}, {
+   3.810073499882248*^9, 3.810073512019329*^9}, {3.810074317710678*^9, 
+   3.810074373377843*^9}, 3.8100760383607407`*^9, {3.811100366973123*^9, 
+   3.811100387420863*^9}, 3.811100421292748*^9, {3.811100462045281*^9, 
+   3.8111005030434427`*^9}, {3.811100534693619*^9, 3.8111005521468267`*^9}, {
+   3.811101240524329*^9, 3.811101249621504*^9}, {3.811101287272787*^9, 
+   3.8111013129418573`*^9}, {3.811883248927025*^9, 3.811883300973424*^9}, {
+   3.811883826367365*^9, 3.811883831172567*^9}, {3.811883915748991*^9, 
+   3.811883921930812*^9}, {3.812126390896707*^9, 3.812126402006359*^9}, {
+   3.8121268678665323`*^9, 3.812126910097769*^9}, {3.812127954931983*^9, 
+   3.812127955440908*^9}, {3.812375542451253*^9, 3.8123755455823507`*^9}, {
+   3.812375598712957*^9, 3.812375656211276*^9}, {3.8123948457511272`*^9, 
+   3.8123948533158607`*^9}, {3.812400727633115*^9, 3.812400728194414*^9}, {
+   3.812400844257092*^9, 3.8124008732094707`*^9}, {3.812472409294034*^9, 
+   3.812472439343351*^9}, 3.8124724800120296`*^9, 3.8124725259836693`*^9, {
+   3.812479975555272*^9, 3.8124799915057373`*^9}, {3.8130922680561647`*^9, 
+   3.81309233684718*^9}, 3.8130923813152742`*^9, {3.813238206249696*^9, 
+   3.8132383250453157`*^9}, {3.813238708461791*^9, 3.813238824908698*^9}, {
+   3.813238883549582*^9, 3.813238953824993*^9}, {3.813238990534446*^9, 
+   3.813239078325213*^9}, {3.813239139499569*^9, 3.813239181057119*^9}, {
+   3.8132793933424892`*^9, 3.81327939660034*^9}, {3.813526892818115*^9, 
+   3.813526926845482*^9}, {3.8138585791181726`*^9, 3.813858620009198*^9}, {
+   3.813858741520487*^9, 3.813858746524785*^9}, {3.814021194691745*^9, 
+   3.814021358718536*^9}, {3.814021634754713*^9, 3.814021638617971*^9}, {
+   3.8140217858622227`*^9, 3.814021808826624*^9}, {3.814021857602174*^9, 
+   3.814021863302575*^9}, {3.814021923404951*^9, 3.814021992730035*^9}, {
+   3.814022605729024*^9, 3.814022613854906*^9}, {3.814713283968665*^9, 
+   3.814713317481146*^9}, {3.814713383073255*^9, 3.814713406962205*^9}, {
+   3.8147139123436813`*^9, 3.814713913143175*^9}, {3.8147158078213243`*^9, 
+   3.814715808908218*^9}, {3.814718088936627*^9, 3.81471809173379*^9}, {
+   3.814823917765273*^9, 3.814823918755905*^9}, {3.8148246852792873`*^9, 
+   3.814824694831326*^9}, {3.814824735446001*^9, 3.8148247886604548`*^9}, {
+   3.814824913716137*^9, 3.8148249150892687`*^9}, {3.8148250054351797`*^9, 
+   3.814825028707522*^9}, {3.814825075011715*^9, 3.814825084233467*^9}, {
+   3.814825139750845*^9, 3.8148251733622847`*^9}, {3.814825240780531*^9, 
+   3.81482525386434*^9}, {3.81482531365788*^9, 3.814825361545218*^9}, 
+   3.814825411773704*^9, {3.814825468709898*^9, 3.8148255031509657`*^9}, {
+   3.8148255373639307`*^9, 3.8148255396463823`*^9}, {3.8148255735910683`*^9, 
+   3.814825584109449*^9}, {3.814825740684578*^9, 3.814825788269429*^9}, {
+   3.8148258970191517`*^9, 3.814825917316976*^9}, {3.814826013211025*^9, 
+   3.814826019601934*^9}, {3.814826166390834*^9, 3.8148261679298143`*^9}, {
+   3.814827380150063*^9, 3.814827381490314*^9}, {3.814829395788374*^9, 
+   3.814829458041398*^9}, {3.814829638664975*^9, 3.8148296426808558`*^9}, {
+   3.8148308339389553`*^9, 3.8148308851402693`*^9}, {3.8148309168432627`*^9, 
+   3.814830990357891*^9}, {3.8148310261346197`*^9, 3.814831076939788*^9}, {
+   3.8148311173767443`*^9, 3.814831137419416*^9}, {3.814831244041561*^9, 
+   3.814831259661313*^9}, {3.814831352244622*^9, 3.81483139630917*^9}, {
+   3.814831429267439*^9, 3.814831477616029*^9}, {3.814831622251782*^9, 
+   3.814831630345171*^9}, {3.8148319840338917`*^9, 3.814832009546968*^9}, {
+   3.8148320917571907`*^9, 3.814832139124371*^9}, {3.814839752979867*^9, 
+   3.8148398274146147`*^9}, {3.814911824844862*^9, 3.814911839367766*^9}, {
+   3.8149133839815493`*^9, 3.81491345492589*^9}, {3.814913508186139*^9, 
+   3.814913526335918*^9}, {3.814913573783382*^9, 3.8149136628824043`*^9}, {
+   3.814913692912775*^9, 3.8149137025471487`*^9}, {3.81492145452212*^9, 
+   3.814921487683403*^9}, {3.8149217824985533`*^9, 3.814921786491427*^9}, {
+   3.814922160588161*^9, 3.8149221614041023`*^9}, {3.814922200294053*^9, 
+   3.81492225287811*^9}, {3.814925297939839*^9, 3.8149253162978067`*^9}, {
+   3.814925383261262*^9, 3.814925467701063*^9}, {3.8149259809520893`*^9, 
+   3.81492598101755*^9}, {3.814926099685523*^9, 3.8149261206234407`*^9}, {
+   3.814926557709441*^9, 3.814926583849593*^9}, {3.814932436344689*^9, 
+   3.8149324366920547`*^9}, {3.8149935001148357`*^9, 3.814993504994207*^9}, {
+   3.816629935364431*^9, 3.816629954044794*^9}, {3.8166300497355413`*^9, 
+   3.816630108206584*^9}, {3.8166302494992437`*^9, 3.816630253974196*^9}, {
+   3.8166303794183693`*^9, 3.816630380568673*^9}, {3.819044528551043*^9, 
+   3.8190445335708*^9}, {3.819048758573165*^9, 3.819048766682119*^9}, {
+   3.819049544889534*^9, 3.819049558551977*^9}, {3.8190497321459627`*^9, 
+   3.8190497324750032`*^9}, {3.82069638019853*^9, 3.8206964210719957`*^9}, {
+   3.825525373199613*^9, 3.825525373891184*^9}, {3.8257130748777122`*^9, 
+   3.8257130777592936`*^9}, {3.826050812123684*^9, 3.826050849736743*^9}, {
+   3.826303309202983*^9, 3.826303321766192*^9}, {3.826303357368044*^9, 
+   3.826303382099575*^9}, {3.826303586810252*^9, 3.8263035875512505`*^9}},
+ CellLabel->"In[25]:=",ExpressionUUID->"59f9a558-41eb-42e9-9fb5-02ff40302956"]
+},
+WindowSize->{812, 975},
+WindowMargins->{{Automatic, 429}, {35, Automatic}},
+TaggingRules->{
+ "SEUploaderLastUpdateCheck" -> 3.7676352106363276`17.3286438361266*^9, 
+  "SEUploaderVersion" -> {
+   "Version" -> 130, "Changes" -> {"Fixed SE Uploader to use https"}}, 
+  "TryRealOnly" -> False},
+FrontEndVersion->"12.2 for Mac OS X x86 (64-bit) (December 12, 2020)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"88550764-d466-4534-b604-26d2519d3240"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 88442, 2075, 9985, "Input",ExpressionUUID->"59f9a558-41eb-42e9-9fb5-02ff40302956"]
+}
+]
+*)
+
